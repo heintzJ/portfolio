@@ -20,7 +20,10 @@ const formatter = new Intl.ListFormat('en', {
 });
 // command_list is a list of all the keys in the commands variable
 const command_list = Object.keys(commands);
-const help = formatter.format(command_list);
+const formatted_list = command_list.map(cmd => {
+    return `<white class="command">${cmd}</white>`;
+});
+const help = formatter.format(formatted_list);
 
 // set the font and load it
 const font = 'Star Wars';
