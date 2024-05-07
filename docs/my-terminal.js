@@ -1,3 +1,10 @@
+const root = '~';
+// current working directory
+let cwd = root;
+
+const user = 'guest';
+const server = 'jackHeintz';
+
 // commands holds the commands that can be used
 const commands = {
     help() {
@@ -11,8 +18,64 @@ const commands = {
         this.clear();
         ready()
     },
-    ls() {
-        terminal.echo(directories);
+    ls(dir = null) {
+        if (dir) {
+            // absolute path
+            if (dir.startsWith('~')) {
+                // get the "~/" as the root path
+                const path = dir.substring(2);
+                // turn the string into an array, starting after ~/
+                const dirs = path.split('/');
+                if (dirs.length > 1) {
+                    this.error('Invalid directory');
+                } else {
+                    // dir is the name of the directory after ~/
+                    const dir = dirs[0];
+                    // retrieve the contents of the directory
+                    this.echo(directories[dir].join('\n'));
+                }
+            }
+            // root directory
+            else if (cwd === root) {
+                if (dir in directories) {
+                    this.echo(directories[dir].join('\n'));
+                } else {
+                    this.error('Invalid directory');
+                }
+            } 
+            // print parent directory
+            else if (dir === '..') {
+                print_dirs
+            }
+            else {
+                this.error('Invalid directory');
+            }
+        }
+        // if no dir provided and we are in the root directory
+        else if (cwd === root) {
+            print_dirs();
+        }
+        // if no dir provided and we are within some other directory
+        else {
+            const dir = cwd.substring(2); // get rid of ~/
+            this.echo(directories[dir].join('\n'));
+        }
+    },
+    cd(dir = null) {
+        // send the user to the root directory
+        if (dir === null || (dir === '..' && cwd !== root)) {
+            cwd = root;
+        }
+        // if the dest starts with / and is in directories, send the user to dir
+        else if (dir.startsWith('~/') && `${dir.substring(2)}` in directories) {
+            cwd = dir;
+        }
+        // if the dest is under the current directory
+        else if (`${dir}` in directories) {
+            cwd = root + '/' + dir;
+        } else {
+            this.error('Wrong directory');
+        }
     }
 };
 
@@ -20,7 +83,8 @@ const terminal = $('body').terminal(commands, {
     greetings: false,
     checkArity: false,
     exit: false,
-    completion: true
+    completion: true,
+    prompt
 });
 
 // formatter creates a formatted list for the help command
@@ -53,13 +117,17 @@ const directories = {
         [
             ['Online Club Management Platform',
              'https://github.com/andrearcaina/vivid',
-             'A full-stack web application for a fitness club that enables easy management of the club. It includes user authentication, a messaging platform for all members and administrators, and a membership management system for administration.'
+             'A full-stack web application for a fitness club that enables\na messaging platform for all members and administrators,\nand a membership management system for administration.'
             ]
         ].map(([name, url, description = '']) => {
-            return `* <a href="${url}">${name}</a> &mdash; <white>${description}</white>`;
+            return `${url}\n${name}\n[[;white;]${description}]`;
         })
     ].flat()
 };
+
+function prompt() {
+    return `[[;#44D544;]${user}@${server}]:[[;#55F;]${cwd}]$ `;
+}
 
 // on page ready, show the greeting
 function ready() {
@@ -67,7 +135,7 @@ function ready() {
     // text remains responsive while resizing page
     terminal.echo(() => {
         const ascii = render("Jack Heintz");
-        return `[[;green;]${ascii}]\nWelcome to my website\nType [[b;white;]ls] to get started or [[b;white;]help] to get a list of commands`;
+        return `[[;#44D544;]${ascii}]\nWelcome to my website\nType [[b;white;]ls] to get started or [[b;white;]help] to get a list of commands`;
     });
 }
 
@@ -80,3 +148,16 @@ function render(text) {
         whitespaceBreak: true
     });
 }
+
+// print all directories
+function print_dirs() {
+    terminal.echo("------\nType [[;white;]cd <directory name>] or click on a directory to view its contents\n------")
+    for (dir in directories) {
+        terminal.echo(`[[;#55F;;dir]${dir}]`);
+    }
+}
+
+terminal.on('click', '.dir', function() {
+    const dir = $(this).text();
+    terminal.exec(`cd ~/${dir}`);
+});
