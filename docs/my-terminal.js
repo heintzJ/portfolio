@@ -58,6 +58,7 @@ const commands = {
         // if no dir provided and we are within some other directory
         else {
             const dir = cwd.substring(2); // get rid of ~/
+            this.echo('Type [[;white;]cat <file name>] to see the contexts of a file.')
             this.echo(directories[dir].join('\n'));
         }
     },
@@ -75,6 +76,16 @@ const commands = {
             cwd = root + '/' + dir;
         } else {
             this.error('Wrong directory');
+        }
+    },
+    cat(file = null) {
+        if (file !== null) {
+            fname = file.substring(0, file.length - 4);
+            if (fname in files) {
+                print_file(fname)
+            } else {
+                terminal.error('File does not exist')
+            }
         }
     }
 };
@@ -128,19 +139,54 @@ $.terminal.new_formatter(function(string) {
 
 // set the directories to store information and links
 const directories = {
+    about: [
+        '',
+        '[[;white;]about.txt]',
+        ''
+    ],
     projects: [
         '',
-        '[[;white;]Projects]',
+        '[[;white;;txt]projects.txt]',
+        ''
+    ].flat(),
+    education: [
+        '',
+        '[[;white;]education.txt]',
+        ''
+    ]
+};
+
+const files = {
+    about: [
+        '',
+        'Hello! My name is Jack Heintz and I am a Computer Science student at\n Toronto Metropolitan University. I am looking for Co Op opportunites for the\nFall/Winter semesters, but am currently working as an Above-Ground Pool Installer\nand a Farm Hand. During my free time I love to read, go for runs, spend time\noutside, and develop programming projects. I am interested in web development\nand mainframe.',
+        '',
+    ],
+    projects: [
+        '',
         [
             ['Online Club Management Platform',
              'https://github.com/andrearcaina/vivid',
              'A full-stack web application for a fitness club that enables\na messaging platform for all members and administrators,\nand a membership management system for administration.'
+            ],
+    
+            ['Websites for CPS530',
+             'https://github.com/heintzJ/CPS530-Labs',
+             'A collection of labs for a web development course I took at TMU.\nLanguages used are HTML, CSS, JavaScript, Python, PHP, Perl, Ruby, and MySQL'
             ]
         ].map(([name, url, description = '']) => {
-            return `${url}\n${name}\n[[;white;]${description}]`;
-        })
-    ].flat()
-};
+            return `${name}\n${url}\n[[;white;]${description}\n]`;
+        }),
+        ''
+    ].flat(),
+    education: [
+        '',
+        [
+            'Toronto Metropolitan University\nGPA: 3.97/4.33\nRelevant courses: Operating Systems, C/Linux, Web Development, Python, Data Structures, Communications'
+        ],
+        ''
+    ]
+}
 
 function prompt() {
     return `[[;#44D544;]${user}@${server}]:[[;#55F;]${cwd}]$ `;
@@ -174,7 +220,16 @@ function print_dirs() {
     }
 }
 
+function print_file(file) {
+    terminal.echo(files[file])
+}
+
 terminal.on('click', '.dir', function() {
     const dir = $(this).text();
     terminal.exec(`cd ~/${dir}`);
+});
+
+terminal.on('click', '.txt', function() {
+    const file = $(this).text();
+    terminal.exec(`cat ${file}`);
 });
