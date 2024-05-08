@@ -2,7 +2,7 @@ const root = '~';
 // current working directory
 let cwd = root;
 
-const user = 'guest';
+const user = 'user';
 const server = 'jackHeintz';
 
 // commands holds the commands that can be used
@@ -45,7 +45,7 @@ const commands = {
             } 
             // print parent directory
             else if (dir === '..') {
-                print_dirs
+                print_dirs();
             }
             else {
                 this.error('Invalid directory');
@@ -58,7 +58,7 @@ const commands = {
         // if no dir provided and we are within some other directory
         else {
             const dir = cwd.substring(2); // get rid of ~/
-            this.echo('Type [[;white;]cat <file name>] to see the contexts of a file.')
+            this.echo('Type [[;white;]cat <file name>] or click on the file name to see the contexts of a file.')
             this.echo(directories[dir].join('\n'));
         }
     },
@@ -71,8 +71,13 @@ const commands = {
         else if (dir.startsWith('~/') && `${dir.substring(2)}` in directories) {
             cwd = dir;
         }
+        // if the user uses ../ to go to root and then to directory in one line
+        else if (dir.startsWith('../') && `${dir.substring(3)}` in directories) {
+            cwd = `~/${dir.substring(3)}`;
+        }
         // if the dest is under the current directory
         else if (`${dir}` in directories) {
+            terminal.echo("------\nType [[;white;]ls] to view contents\n------");
             cwd = root + '/' + dir;
         } else {
             this.error('Wrong directory');
@@ -82,7 +87,7 @@ const commands = {
         if (file !== null) {
             fname = file.substring(0, file.length - 4);
             if (fname in files) {
-                print_file(fname)
+                print_file(fname);
             } else {
                 terminal.error('File does not exist')
             }
@@ -105,10 +110,16 @@ const terminal = $('body').terminal(commands, {
             if (rest.startsWith('~/')) {
                 return Object.keys(directories).map(dir => `~/${dir}`);
             }
+            // if using ../dir
+            else if (rest.startsWith('../')) {
+                return Object.keys(directories).map(dir => `../${dir}`);
+            }
             // if we are in the root, return an array of suggestions within the root level
             if (cwd === root) {
                 return Object.keys(directories);
             }
+        } else if (name === 'cat') {
+            return Object.keys(files).map(file => `${file}.txt`);
         }
         return Object.keys(commands);
     },
@@ -159,8 +170,8 @@ const directories = {
 const files = {
     about: [
         '',
-        'Hello! My name is Jack Heintz and I am a Computer Science student at\n Toronto Metropolitan University. I am looking for Co Op opportunites for the\nFall/Winter semesters, but am currently working as an Above-Ground Pool Installer\nand a Farm Hand. During my free time I love to read, go for runs, spend time\noutside, and develop programming projects. I am interested in web development\nand mainframe.',
-        '',
+        'Hello! My name is Jack Heintz and I am a Computer Science student at Toronto\nMetropolitan University. I am looking for Co Op opportunites for the Fall/Winter\nsemesters, but am currently working as an Above-Ground Pool Installer and a Farm\nHand. During my free time I love to read, go for runs, spend time outside, and\ndevelop programming projects. I am interested in web development and mainframe.',
+        ''
     ],
     projects: [
         '',
@@ -175,14 +186,13 @@ const files = {
              'A collection of labs for a web development course I took at TMU.\nLanguages used are HTML, CSS, JavaScript, Python, PHP, Perl, Ruby, and MySQL'
             ]
         ].map(([name, url, description = '']) => {
-            return `${name}\n${url}\n[[;white;]${description}\n]`;
+            return `[[;white;]${name}]\n${url}\n${description}\n`;
         }),
-        ''
     ].flat(),
     education: [
         '',
         [
-            'Toronto Metropolitan University\nGPA: 3.97/4.33\nRelevant courses: Operating Systems, C/Linux, Web Development, Python, Data Structures, Communications'
+            'Toronto Metropolitan University (2022-Present)\nGPA: 3.97/4.33\nRelevant courses: Operating Systems, C/Linux, Web Development, Python, Data Structures, Communications',
         ],
         ''
     ]
@@ -198,7 +208,7 @@ function ready() {
     // text remains responsive while resizing page
     terminal.echo(() => {
         const ascii = render("Jack Heintz");
-        return `[[;#44D544;]${ascii}]\nWelcome to my website\nType [[b;white;]ls] to get started or [[b;white;]help] to get a list of commands`;
+        return `[[;#44D544;]${ascii}]\nWelcome to my website\nType [[b;white;]ls] to get started or [[b;white;]help] to get a list of commands. Tab completion is supported!`;
     });
 }
 
@@ -221,7 +231,7 @@ function print_dirs() {
 }
 
 function print_file(file) {
-    terminal.echo(files[file])
+    terminal.echo(files[file]);
 }
 
 terminal.on('click', '.dir', function() {
