@@ -5,6 +5,71 @@ let cwd = root;
 const user = 'user';
 const server = 'jackHeintz';
 
+// set the directories to store information and links
+const directories = {
+    about: [
+        '',
+        '[[;white;;txt]about.txt]',
+        ''
+    ],
+    projects: [
+        '',
+        '[[;white;;txt]projects.txt]',
+        ''
+    ].flat(),
+    education: [
+        '',
+        '[[;white;;txt]education.txt]',
+        ''
+    ]
+};
+
+const files = {
+    about: [
+        '',
+        'Hello! My name is Jack Heintz and I am a Computer Science student at Toronto\nMetropolitan University. I am looking for Co Op opportunites for the Fall/Winter\nsemesters, but am currently working as an Above-Ground Pool Installer and a Farm\nHand. During my free time I love to read, go for runs, spend time outside, and\ndevelop programming projects. I am interested in web development and mainframe.',
+        ''
+    ],
+    projects: [
+        '',
+        [
+            ['Online Club Management Platform',
+             'https://github.com/andrearcaina/vivid',
+             'A full-stack web application for a fitness club that enables\na messaging platform for all members and administrators,\nand a membership management system for administration. Created with 4 other group members.'
+            ],
+    
+            ['Websites for CPS530',
+             'https://github.com/heintzJ/CPS530-Labs',
+             'A collection of labs for a web development course I took at TMU.\nLanguages used are HTML, CSS, JavaScript, Python, PHP, Perl, Ruby, and MySQL'
+            ],
+
+            ['Audio Application Simulator',
+             'https://github.com/heintzJ/CPS209-A1',
+             'This project simulates the experience of an audio listening application, such as\nSpotify or Apple Music. It supports, music, podcasts, and audiobooks, with each\ntype of audio having its own class and methods. It also supports a playlist\nfeature, which songs and podcasts can be added to.'
+            ],
+
+            ['Custom Linked List in C',
+             'https://github.com/heintzJ/LinkedList-in-C',
+             'My attempt on a linked list structure written in C. It supports addition, deletion, and getter methods.'
+            ],
+
+            ['ARC Assembly to Machine Code Translator',
+             'https://github.com/heintzJ/Machine-Coder',
+             'This is a Java Swing program that takes in an ARC Assembly instruction in a GUI\nand produces the corresponding machine code that the processor would use.'
+            ]
+        ].map(([name, url, description = '']) => {
+            return `[[;white;]${name}]\n${url}\n${description}\n`;
+        }),
+    ].flat(),
+    education: [
+        '',
+        [
+            'Toronto Metropolitan University (2022-Present)\nGPA: 3.97/4.33\nRelevant courses: Operating Systems, C/Linux, Web Development, Python, Data Structures, Communications',
+        ],
+        ''
+    ]
+}
+
 // commands holds the commands that can be used
 const commands = {
     help() {
@@ -148,56 +213,6 @@ $.terminal.new_formatter(function(string) {
     });
 });
 
-// set the directories to store information and links
-const directories = {
-    about: [
-        '',
-        '[[;white;]about.txt]',
-        ''
-    ],
-    projects: [
-        '',
-        '[[;white;;txt]projects.txt]',
-        ''
-    ].flat(),
-    education: [
-        '',
-        '[[;white;]education.txt]',
-        ''
-    ]
-};
-
-const files = {
-    about: [
-        '',
-        'Hello! My name is Jack Heintz and I am a Computer Science student at Toronto\nMetropolitan University. I am looking for Co Op opportunites for the Fall/Winter\nsemesters, but am currently working as an Above-Ground Pool Installer and a Farm\nHand. During my free time I love to read, go for runs, spend time outside, and\ndevelop programming projects. I am interested in web development and mainframe.',
-        ''
-    ],
-    projects: [
-        '',
-        [
-            ['Online Club Management Platform',
-             'https://github.com/andrearcaina/vivid',
-             'A full-stack web application for a fitness club that enables\na messaging platform for all members and administrators,\nand a membership management system for administration.'
-            ],
-    
-            ['Websites for CPS530',
-             'https://github.com/heintzJ/CPS530-Labs',
-             'A collection of labs for a web development course I took at TMU.\nLanguages used are HTML, CSS, JavaScript, Python, PHP, Perl, Ruby, and MySQL'
-            ]
-        ].map(([name, url, description = '']) => {
-            return `[[;white;]${name}]\n${url}\n${description}\n`;
-        }),
-    ].flat(),
-    education: [
-        '',
-        [
-            'Toronto Metropolitan University (2022-Present)\nGPA: 3.97/4.33\nRelevant courses: Operating Systems, C/Linux, Web Development, Python, Data Structures, Communications',
-        ],
-        ''
-    ]
-}
-
 function prompt() {
     return `[[;#44D544;]${user}@${server}]:[[;#55F;]${cwd}]$ `;
 }
@@ -236,7 +251,7 @@ function print_file(file) {
 
 terminal.on('click', '.dir', function() {
     const dir = $(this).text();
-    terminal.exec(`cd ~/${dir}`);
+    terminal.exec(`cd ${dir}`);
 });
 
 terminal.on('click', '.txt', function() {
