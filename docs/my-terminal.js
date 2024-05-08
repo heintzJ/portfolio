@@ -84,6 +84,23 @@ const terminal = $('body').terminal(commands, {
     checkArity: false,
     exit: false,
     completion: true,
+    completion(string) {
+        // get the current command being typed
+        const cmd = this.get_command();
+        // name is cmd, rest is arguments
+        const {name, rest} = $.terminal.parse_command(cmd);
+        if (['cd', 'ls'].includes(name)) {
+            // absolute path - need to prepend ~/ to each suggested completion
+            if (rest.startsWith('~/')) {
+                return Object.keys(directories).map(dir => `~/${dir}`);
+            }
+            // if we are in the root, return an array of suggestions within the root level
+            if (cwd === root) {
+                return Object.keys(directories);
+            }
+        }
+        return Object.keys(commands);
+    },
     prompt
 });
 
