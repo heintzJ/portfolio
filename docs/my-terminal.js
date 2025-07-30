@@ -27,7 +27,7 @@ const directories = {
 const files = {
     about: [
         '',
-        'Hello! My name is Jack Heintz and I am a Computer Science student at Toronto\nMetropolitan University. I am looking for Co Op opportunites for the Fall/Winter\nsemesters, but am currently working as an Above-Ground Pool Installer and a Farm\nHand. During my free time I love to read, go for runs, spend time outside, and\ndevelop programming projects. I am interested in web development and mainframe.',
+        'Hello! My name is Jack Heintz and I am a Computer Science student at Toronto\nMetropolitan University. I am looking for Co Op opportunites for the Winter\nsemester, and have been working as a DevOps intern and a Farmhand on weekends.\nDuring my free time I love to read, go for runs, spend time outside, and\ndevelop programming projects. I am interested in DevOps and web development.',
         ''
     ],
     projects: [
@@ -202,7 +202,7 @@ const help_list = formatter.format(command_list);
 
 // set the font and load it
 const font = 'Star Wars';
-figlet.defaults({ fontPath: 'https://unpkg.com/figlet/fonts/' });
+figlet.defaults({ fontPath: 'https://unpkg.com/figlet/fonts' });
 figlet.preloadFonts([font], ready);
 
 // syntax highlighting
